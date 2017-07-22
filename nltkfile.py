@@ -42,12 +42,12 @@ def normalize():
 			print(e)
 
 	db.close()
-	print("Successfully added to database.")
+	
 
 
 def get_preprocessed():
 	cursor = db.cursor()
-	cursor.execute("SELECT content FROM preprocessed")
+	cursor.execute("SELECT preprocessed FROM page")
 
 	for row in cursor.fetchall():
 		content.append(row)
@@ -88,43 +88,9 @@ def allCosine_sim():
 				print(e)
 	db.close()
 
-# def old_link_table():
-	#loop content
-	# contentCount = len(content)
-
-	# cursor = db.cursor()
-	# for x in range(0, contentCount):
-	# 	for y in range(x, contentCount):
-	# 		firstDoc = content[x]
-	# 		secondDoc = content[y]
-	# 		fnl_score = cosine_sim(firstDoc, secondDoc) 
-	# 		print(x,y,fnl_score)
-
-	# 		indexX = x+1
-	# 		indexY = y+1
-	# 		try:
-	# 			cursor.execute("""INSERT INTO score (article_1, article_2, cos_sim) VALUES ("%d","%d","%f")""" % (indexX, indexY, fnl_score))
-
-	# 			db.commit()
-
-	# 			# print(x,fnl_score)
-	# 		except MySQLError as e:
-	# 			print(e)
-	# db.close()
-
-	# #get id page of link from link table
-	# "SELECT "
-
-	# id_score = 
-	# src_page = 
-	# desti_page =
-	# score =  
-
-
-
 
 #call functions
 normalize()
 # get_preprocessed()
-# cosine_sim(content[4], content[34])
+# cosine_sim(content[0], content[1])
 # allCosine_sim()
