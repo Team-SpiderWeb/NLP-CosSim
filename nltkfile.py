@@ -8,18 +8,19 @@ from nltk.stem.porter import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-db = pymysql.connect("localhost","root","belle","thsst" )
+db = pymysql.connect("localhost","root","belle","thsst_v2" )
 
 content = []
 
 def normalize():
 	cursor = db.cursor()
-	cursor.execute("SELECT content FROM page")
+	cursor.execute("SELECT idpage, content FROM page")
 
 	stop_words = set(stopwords.words('english'))
 
 	for row in cursor.fetchall():
-		data = row
+		idPageNum = row[0]
+		data = row[1]
 
 		#remove special char, tokenize & change to lowercase, remove stop words
 		data = re.sub('[^A-Za-z0-9]+', ' ', data)
@@ -34,10 +35,11 @@ def normalize():
 
 		#insert to db
 		try:
-			cursor.execute("""INSERT INTO preprocessed (content) VALUES ("%s")""" % (fnl_text))
+			cursor.execute ("""UPDATE page SET preprocessed=%s WHERE idpage=%s""", (fnl_text, idPageNum))
+			# cursor.execute("""INSERT INTO preprocessed (content) VALUES ("%s")""" % (fnl_text))
 			db.commit()
-		except:
-			pass
+		except MySQLError as e:
+			print(e)
 
 	db.close()
 	print("Successfully added to database.")
@@ -122,7 +124,7 @@ def allCosine_sim():
 
 
 #call functions
-
-get_preprocessed()
+normalize()
+# get_preprocessed()
 # cosine_sim(content[4], content[34])
 # allCosine_sim()
