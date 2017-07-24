@@ -8,7 +8,7 @@ from nltk.stem.porter import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-db = pymysql.connect("localhost","root","belle","thsst_v2" )
+db = pymysql.connect("localhost","root","belle","thsst_db" )
 
 content = []
 
@@ -36,24 +36,16 @@ def normalize():
 		#insert to db
 		try:
 			cursor.execute ("""UPDATE page SET preprocessed=%s WHERE idpage=%s""", (fnl_text, idPageNum))
-			# cursor.execute("""INSERT INTO preprocessed (content) VALUES ("%s")""" % (fnl_text))
 			db.commit()
 		except MySQLError as e:
 			print(e)
-
-	db.close()
 	
-
-
 def get_preprocessed():
 	cursor = db.cursor()
 	cursor.execute("SELECT preprocessed FROM page")
 
 	for row in cursor.fetchall():
-		content.append(row)
-
-	print(content)
-	db.close()
+		content.append(row[0])
 
 
 def cosine_sim(text1, text2):
@@ -74,23 +66,21 @@ def allCosine_sim():
 			firstDoc = content[x]
 			secondDoc = content[y]
 			fnl_score = cosine_sim(firstDoc, secondDoc) 
-			print(x,y,fnl_score)
 
 			indexX = x+1
 			indexY = y+1
 			try:
-				cursor.execute("""INSERT INTO score (article_1, article_2, cos_sim) VALUES ("%d","%d","%f")""" % (indexX, indexY, fnl_score))
-
+				print(indexX,indexY,fnl_score)
+				cursor.execute("""INSERT INTO score (article_1, article_2, cos_sim) VALUES ("%d","%d","%.13f")""" % (indexX, indexY, fnl_score))
 				db.commit()
-
-				# print(x,fnl_score)
 			except MySQLError as e:
 				print(e)
+	
 	db.close()
 
 
 #call functions
-normalize()
-# get_preprocessed()
+# normalize()
+get_preprocessed()
 # cosine_sim(content[0], content[1])
-# allCosine_sim()
+allCosine_sim()
